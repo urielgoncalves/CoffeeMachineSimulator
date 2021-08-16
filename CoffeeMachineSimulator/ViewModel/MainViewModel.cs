@@ -1,13 +1,10 @@
-﻿using Prism.Commands;
+﻿using CoffeeMachine.EventHub.Sender.Model;
+using Prism.Commands;
 using Prism.Mvvm;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 
-namespace CoffeeMachineSimulator.ViewModel
+namespace CoffeeMachine.UI.ViewModel
 {
     public class MainViewModel : BindableBase
     {
@@ -70,12 +67,32 @@ namespace CoffeeMachineSimulator.ViewModel
         private void MakeCappuccino()
         {
             CounterCappuccino++;
+            CoffeeMachineData coffeeMachineData = CreateCoffeMachineData(nameof(CounterCappuccino), CounterCappuccino);
+            SendData(coffeeMachineData);
         }
 
         private void MakeEspresso()
         {
             CounterEspresso++;
+            CoffeeMachineData coffeeMachineData = CreateCoffeMachineData(nameof(CounterEspresso), CounterEspresso);
+            SendData(coffeeMachineData);
         }
 
+        private CoffeeMachineData CreateCoffeMachineData(string sensorType, int sensorValue)
+        {
+            return new()
+            {
+                City = City,
+                SerialNumber = SerialNumber,
+                SensorType = nameof(sensorType),
+                SensorValue = sensorValue,
+                RecordingTime = DateTime.Now
+            };
+        }
+
+        private void SendData(CoffeeMachineData coffeeMachineData)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

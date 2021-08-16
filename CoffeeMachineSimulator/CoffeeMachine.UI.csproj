@@ -10,4 +10,8 @@
     <PackageReference Include="Prism.Core" Version="8.1.97" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\CoffeeMachine.EventHub.Sender\CoffeeMachine.EventHub.Sender.csproj" />
+  </ItemGroup>
+
 </Project>
