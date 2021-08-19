@@ -5,9 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CoffeeMachineSimulator"
         mc:Ignorable="d"
-        Title="Coffee Machine Simulator" Height="450" Width="800">
+        Title="Coffee Machine Simulator" Height="400" Width="525" FontSize="16">
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition />
@@ -53,6 +55,12 @@
                 <TextBlock Text="Bean level" />
                 <Slider />
             </StackPanel>
+        </GroupBox>
+
+        <GridSplitter Grid.Row="3" Grid.ColumnSpan="2" Height="5" HorizontalAlignment="Stretch" />
+
+        <GroupBox Header="Logs" Grid.Row="4" Grid.ColumnSpan="2">
+            <ListView ItemsSource="{Binding Logs}" />
         </GroupBox>
     </Grid>
 </Window>

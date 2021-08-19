@@ -9,5 +9,10 @@ namespace CoffeeMachine.EventHub.Sender.Model
         public string SensorType { get; set; }
         public int SensorValue { get; set; }
         public DateTime RecordingTime { get; set; }
+
+        public override string ToString()
+        {
+            return $"Time: {RecordingTime:HH:mm:ss} | {SensorType}: {SensorValue} | City: {City} | SerialNumber: {SerialNumber} ";
+        }
     }
 }
