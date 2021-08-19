@@ -1,4 +1,6 @@
-﻿using CoffeeMachine.UI.ViewModel;
+﻿using CoffeeMachine.EventHub.Sender;
+using CoffeeMachine.UI.ViewModel;
+using System.Configuration;
 using System.Windows;
 
 namespace CoffeeMachine.UI
@@ -11,7 +13,9 @@ namespace CoffeeMachine.UI
         public MainWindow()
         {
             InitializeComponent();
-            DataContext = new MainViewModel();
+            
+            string eventHubConnectionString = ConfigurationManager.AppSettings.Get("EventHubConnectionString");
+            DataContext = new MainViewModel(new CoffeeMachineDataSender(eventHubConnectionString)); //TODO: ADD DEPENDENCY INJECTION
         }
     }
 }

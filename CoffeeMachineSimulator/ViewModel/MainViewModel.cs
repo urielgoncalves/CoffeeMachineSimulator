@@ -1,4 +1,5 @@
-﻿using CoffeeMachine.EventHub.Sender.Model;
+﻿using CoffeeMachine.EventHub.Sender;
+using CoffeeMachine.EventHub.Sender.Model;
 using Prism.Commands;
 using Prism.Mvvm;
 using System;
@@ -12,16 +13,19 @@ namespace CoffeeMachine.UI.ViewModel
         private int _counterEspresso;
         private string _city;
         private string _serialNumber;
+        private readonly ICoffeeMachineDataSender _coffeeMachineDataSender;
 
         public ICommand MakeCappuccinoCommand { get; }
         public ICommand MakeEspressoCommand { get; }
 
-        public MainViewModel()
+        public MainViewModel(ICoffeeMachineDataSender coffeeMachineDataSender)
         {
+            _coffeeMachineDataSender = coffeeMachineDataSender;
             SerialNumber = Guid.NewGuid().ToString().Substring(0, 8);
             MakeCappuccinoCommand = new DelegateCommand(MakeCappuccino);
             MakeEspressoCommand = new DelegateCommand(MakeEspresso);
         }
+
 
         public string City
         {
@@ -64,18 +68,18 @@ namespace CoffeeMachine.UI.ViewModel
         }
 
 
-        private void MakeCappuccino()
+        private async void MakeCappuccino()
         {
             CounterCappuccino++;
             CoffeeMachineData coffeeMachineData = CreateCoffeMachineData(nameof(CounterCappuccino), CounterCappuccino);
-            SendData(coffeeMachineData);
+            await _coffeeMachineDataSender.SendDataAsync(coffeeMachineData);
         }
 
-        private void MakeEspresso()
+        private async void MakeEspresso()
         {
             CounterEspresso++;
             CoffeeMachineData coffeeMachineData = CreateCoffeMachineData(nameof(CounterEspresso), CounterEspresso);
-            SendData(coffeeMachineData);
+            await _coffeeMachineDataSender.SendDataAsync(coffeeMachineData);
         }
 
         private CoffeeMachineData CreateCoffeMachineData(string sensorType, int sensorValue)
@@ -88,11 +92,6 @@ namespace CoffeeMachine.UI.ViewModel
                 SensorValue = sensorValue,
                 RecordingTime = DateTime.Now
             };
-        }
-
-        private void SendData(CoffeeMachineData coffeeMachineData)
-        {
-            throw new NotImplementedException();
         }
     }
 }
