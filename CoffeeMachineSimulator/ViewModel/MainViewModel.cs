@@ -15,6 +15,9 @@ namespace CoffeeMachine.UI.ViewModel
         private int _counterEspresso;
         private string _city;
         private string _serialNumber;
+        private int _boilerTemp;
+        private int _beanLevel;
+        private bool _isSendingPeriodically;
         private readonly ICoffeeMachineDataSender _coffeeMachineDataSender;
 
         public MainViewModel(ICoffeeMachineDataSender coffeeMachineDataSender)
@@ -31,7 +34,7 @@ namespace CoffeeMachine.UI.ViewModel
 
         public string City
         {
-            get { return _city; }
+            get => _city;
             set
             {
                 _city = value;
@@ -41,7 +44,7 @@ namespace CoffeeMachine.UI.ViewModel
 
         public string SerialNumber
         {
-            get { return _serialNumber; }
+            get => _serialNumber;
             set
             {
                 _serialNumber = value;
@@ -51,7 +54,7 @@ namespace CoffeeMachine.UI.ViewModel
 
         public int CounterCappuccino
         {
-            get { return _counterCappuccino; }
+            get => _counterCappuccino;
             set
             {
                 _counterCappuccino = value;
@@ -61,10 +64,40 @@ namespace CoffeeMachine.UI.ViewModel
 
         public int CounterEspresso
         {
-            get { return _counterEspresso; }
+            get => _counterEspresso;
             set
             {
                 _counterEspresso = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public int BoilerTemp
+        {
+            get => _boilerTemp;
+            set
+            {
+                _boilerTemp = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public int BeanLevel
+        {
+            get => _beanLevel;
+            set
+            {
+                _beanLevel = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public bool IsSendingPeriodically
+        {
+            get => _isSendingPeriodically;
+            set
+            {
+                _isSendingPeriodically = value;
                 RaisePropertyChanged();
             }
         }

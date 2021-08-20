@@ -49,10 +49,11 @@
 
         <GroupBox Header="Send periodically" Grid.Row="2" Grid.Column="1" Margin="5">
             <StackPanel>
-                <CheckBox Content="Is sending" />
-                <TextBlock Text="Boiler temp" />
-                <Slider />
-                <TextBlock Text="Bean level" />
+                <CheckBox Content="Is sending" IsChecked="{Binding IsSendingPeriodically, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <TextBlock Text="{Binding BoilerTemp, StringFormat=Boiler temp: {0}ºC}" />
+                <Slider Value="{Binding BoilerTemp, Mode=TwoWay}" Maximum="100" />
+                <TextBlock Text="{Binding BeanLevel, StringFormat=Bean level: {0}%}" />
+                <Slider Value="{Binding BeanLevel, Mode=TwoWay}" Maximum="100" />
                 <Slider />
             </StackPanel>
         </GroupBox>
