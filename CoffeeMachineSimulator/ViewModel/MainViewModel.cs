@@ -6,6 +6,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using System.Windows.Threading;
 
 namespace CoffeeMachine.UI.ViewModel
 {
@@ -19,6 +20,7 @@ namespace CoffeeMachine.UI.ViewModel
         private int _beanLevel;
         private bool _isSendingPeriodically;
         private readonly ICoffeeMachineDataSender _coffeeMachineDataSender;
+        private readonly DispatcherTimer _dispatcherTimer;
 
         public MainViewModel(ICoffeeMachineDataSender coffeeMachineDataSender)
         {
@@ -27,6 +29,20 @@ namespace CoffeeMachine.UI.ViewModel
             MakeCappuccinoCommand = new DelegateCommand(MakeCappuccino);
             MakeEspressoCommand = new DelegateCommand(MakeEspresso);
             Logs = new ObservableCollection<string>();
+            _dispatcherTimer = new DispatcherTimer
+            {
+                Interval = TimeSpan.FromSeconds(2)
+            };
+            _dispatcherTimer.Tick += DispatcherTimer_Tick;
+        }
+
+        private async void DispatcherTimer_Tick(object sender, EventArgs e)
+        {
+            CoffeeMachineData boilerTempData = CreateCoffeMachineData(nameof(BoilerTemp), BoilerTemp);
+            CoffeeMachineData beanLevelData = CreateCoffeMachineData(nameof(BeanLevel), BeanLevel);
+
+            await SendDataAsync(boilerTempData);
+            await SendDataAsync(beanLevelData);
         }
 
         public ICommand MakeCappuccinoCommand { get; }
@@ -97,8 +113,21 @@ namespace CoffeeMachine.UI.ViewModel
             get => _isSendingPeriodically;
             set
             {
-                _isSendingPeriodically = value;
-                RaisePropertyChanged();
+                if (_isSendingPeriodically != value)
+                {
+                    _isSendingPeriodically = value;
+
+                    if (_isSendingPeriodically)
+                    {
+                        _dispatcherTimer.Start();
+                    }
+                    else
+                    {
+                        _dispatcherTimer.Stop();
+                    }
+
+                    RaisePropertyChanged();
+                }
             }
         }
 
