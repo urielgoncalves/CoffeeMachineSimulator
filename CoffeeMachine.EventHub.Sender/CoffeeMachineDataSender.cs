@@ -30,8 +30,17 @@ namespace CoffeeMachine.EventHub.Sender
         public async Task SendDataAsync(IEnumerable<CoffeeMachineData> eventData)
         {
             var eventBatch = await _eventHubClient.CreateBatchAsync();
-            _ = eventData.Select(item => eventBatch.TryAdd(CreateEventData(item)));
-            
+
+            foreach (CoffeeMachineData item in eventData)
+            {
+                if (!eventBatch.TryAdd(CreateEventData(item))) // If it exceeds the batch size limit, it returns false
+                {
+                    await _eventHubClient.SendAsync(eventBatch);
+                    eventBatch = await _eventHubClient.CreateBatchAsync();
+                    eventBatch.TryAdd(CreateEventData(item));
+                }
+            }
+
             await _eventHubClient.SendAsync(eventBatch);
         }
 
