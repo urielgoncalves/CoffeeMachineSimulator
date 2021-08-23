@@ -2,7 +2,9 @@
 using Azure.Messaging.EventHubs.Producer;
 using CoffeeMachine.EventHub.Sender.Model;
 using Newtonsoft.Json;
-using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace CoffeeMachine.EventHub.Sender
@@ -23,6 +25,23 @@ namespace CoffeeMachine.EventHub.Sender
             eventBatch.TryAdd(new EventData(JSONData));
 
             await _eventHubClient.SendAsync(eventBatch);
+        }
+
+        public async Task SendDataAsync(IEnumerable<CoffeeMachineData> eventData)
+        {
+            var eventBatch = await _eventHubClient.CreateBatchAsync();
+            _ = eventData.Select(item => eventBatch.TryAdd(CreateEventData(item)));
+            
+            await _eventHubClient.SendAsync(eventBatch);
+        }
+
+        private EventData CreateEventData(CoffeeMachineData eventData)
+        {
+            return new EventData(
+                        Encoding.UTF8.GetBytes(
+                            JsonConvert.SerializeObject(eventData)
+                        )
+                       );
         }
     }
 }

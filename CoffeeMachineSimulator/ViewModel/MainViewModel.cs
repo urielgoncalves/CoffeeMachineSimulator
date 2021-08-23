@@ -3,6 +3,7 @@ using CoffeeMachine.EventHub.Sender.Model;
 using Prism.Commands;
 using Prism.Mvvm;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -41,8 +42,7 @@ namespace CoffeeMachine.UI.ViewModel
             CoffeeMachineData boilerTempData = CreateCoffeMachineData(nameof(BoilerTemp), BoilerTemp);
             CoffeeMachineData beanLevelData = CreateCoffeMachineData(nameof(BeanLevel), BeanLevel);
 
-            await SendDataAsync(boilerTempData);
-            await SendDataAsync(beanLevelData);
+            await SendDataAsync(new[] { boilerTempData, beanLevelData });
         }
 
         public ICommand MakeCappuccinoCommand { get; }
@@ -168,6 +168,23 @@ namespace CoffeeMachine.UI.ViewModel
 
             }
             catch(Exception ex)
+            {
+                WriteLog($"Exception: {ex.Message}");
+            }
+        }
+
+        private async Task SendDataAsync(IEnumerable<CoffeeMachineData> data)
+        {
+            try
+            {
+                await _coffeeMachineDataSender.SendDataAsync(data);
+
+                foreach (CoffeeMachineData item in data)
+                {
+                    WriteLog($"Sent data: {item}");
+                }
+            }
+            catch (Exception ex)
             {
                 WriteLog($"Exception: {ex.Message}");
             }
