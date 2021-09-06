@@ -1,4 +1,4 @@
-﻿using CoffeeMachine.EventHub.Sender.Model;
+﻿using CoffeeMachine.EventHub.Model;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 

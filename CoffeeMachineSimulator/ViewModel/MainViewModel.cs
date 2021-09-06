@@ -1,5 +1,5 @@
-﻿using CoffeeMachine.EventHub.Sender;
-using CoffeeMachine.EventHub.Sender.Model;
+﻿using CoffeeMachine.EventHub.Model;
+using CoffeeMachine.EventHub.Sender;
 using Prism.Commands;
 using Prism.Mvvm;
 using System;

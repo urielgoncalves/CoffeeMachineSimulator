@@ -1,6 +1,6 @@
 ﻿using Azure.Messaging.EventHubs;
 using Azure.Messaging.EventHubs.Producer;
-using CoffeeMachine.EventHub.Sender.Model;
+using CoffeeMachine.EventHub.Model;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Text;
@@ -10,7 +10,7 @@ namespace CoffeeMachine.EventHub.Sender
 {
     public class CoffeeMachineDataSender : ICoffeeMachineDataSender
     {
-        private EventHubProducerClient _eventHubClient;
+        private readonly EventHubProducerClient _eventHubClient;
 
         public CoffeeMachineDataSender(string eventHubConnectionString)
         {
