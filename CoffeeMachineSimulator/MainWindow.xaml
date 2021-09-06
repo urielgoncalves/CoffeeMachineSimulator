@@ -1,13 +1,15 @@
-﻿<Window x:Class="CoffeeMachineSimulator.MainWindow"
+﻿<Window x:Class="CoffeeMachine.UI.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CoffeeMachineSimulator"
         mc:Ignorable="d"
-        Title="Coffee Machine Simulator" Height="450" Width="800">
+        Title="Coffee Machine Simulator" Height="400" Width="525" FontSize="16">
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition />
@@ -47,12 +49,18 @@
 
         <GroupBox Header="Send periodically" Grid.Row="2" Grid.Column="1" Margin="5">
             <StackPanel>
-                <CheckBox Content="Is sending" />
-                <TextBlock Text="Boiler temp" />
-                <Slider />
-                <TextBlock Text="Bean level" />
-                <Slider />
+                <CheckBox Content="Is sending" IsChecked="{Binding IsSendingPeriodically, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <TextBlock Text="{Binding BoilerTemp, StringFormat=Boiler temp: {0}ºC}" />
+                <Slider Value="{Binding BoilerTemp, Mode=TwoWay}" Maximum="100" />
+                <TextBlock Text="{Binding BeanLevel, StringFormat=Bean level: {0}%}" />
+                <Slider Value="{Binding BeanLevel, Mode=TwoWay}" Maximum="100" />
             </StackPanel>
+        </GroupBox>
+
+        <GridSplitter Grid.Row="3" Grid.ColumnSpan="2" Height="5" HorizontalAlignment="Stretch" />
+
+        <GroupBox Header="Logs" Grid.Row="4" Grid.ColumnSpan="2">
+            <ListView ItemsSource="{Binding Logs}" />
         </GroupBox>
     </Grid>
 </Window>

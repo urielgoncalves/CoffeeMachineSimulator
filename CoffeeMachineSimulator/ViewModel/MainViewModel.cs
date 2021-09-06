@@ -1,13 +1,15 @@
-﻿using Prism.Commands;
+﻿using CoffeeMachine.EventHub.Model;
+using CoffeeMachine.EventHub.Sender;
+using Prism.Commands;
 using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using System.Windows.Threading;
 
-namespace CoffeeMachineSimulator.ViewModel
+namespace CoffeeMachine.UI.ViewModel
 {
     public class MainViewModel : BindableBase
     {
@@ -15,20 +17,40 @@ namespace CoffeeMachineSimulator.ViewModel
         private int _counterEspresso;
         private string _city;
         private string _serialNumber;
+        private int _boilerTemp;
+        private int _beanLevel;
+        private bool _isSendingPeriodically;
+        private readonly ICoffeeMachineDataSender _coffeeMachineDataSender;
+        private readonly DispatcherTimer _dispatcherTimer;
+
+        public MainViewModel(ICoffeeMachineDataSender coffeeMachineDataSender)
+        {
+            _coffeeMachineDataSender = coffeeMachineDataSender;
+            SerialNumber = Guid.NewGuid().ToString().Substring(0, 8);
+            MakeCappuccinoCommand = new DelegateCommand(MakeCappuccino);
+            MakeEspressoCommand = new DelegateCommand(MakeEspresso);
+            Logs = new ObservableCollection<string>();
+            _dispatcherTimer = new DispatcherTimer
+            {
+                Interval = TimeSpan.FromSeconds(2)
+            };
+            _dispatcherTimer.Tick += DispatcherTimer_Tick;
+        }
+
+        private async void DispatcherTimer_Tick(object sender, EventArgs e)
+        {
+            CoffeeMachineData boilerTempData = CreateCoffeMachineData(nameof(BoilerTemp), BoilerTemp);
+            CoffeeMachineData beanLevelData = CreateCoffeMachineData(nameof(BeanLevel), BeanLevel);
+
+            await SendDataAsync(new[] { boilerTempData, beanLevelData });
+        }
 
         public ICommand MakeCappuccinoCommand { get; }
         public ICommand MakeEspressoCommand { get; }
 
-        public MainViewModel()
-        {
-            SerialNumber = Guid.NewGuid().ToString().Substring(0, 8);
-            MakeCappuccinoCommand = new DelegateCommand(MakeCappuccino);
-            MakeEspressoCommand = new DelegateCommand(MakeEspresso);
-        }
-
         public string City
         {
-            get { return _city; }
+            get => _city;
             set
             {
                 _city = value;
@@ -38,7 +60,7 @@ namespace CoffeeMachineSimulator.ViewModel
 
         public string SerialNumber
         {
-            get { return _serialNumber; }
+            get => _serialNumber;
             set
             {
                 _serialNumber = value;
@@ -48,7 +70,7 @@ namespace CoffeeMachineSimulator.ViewModel
 
         public int CounterCappuccino
         {
-            get { return _counterCappuccino; }
+            get => _counterCappuccino;
             set
             {
                 _counterCappuccino = value;
@@ -58,7 +80,7 @@ namespace CoffeeMachineSimulator.ViewModel
 
         public int CounterEspresso
         {
-            get { return _counterEspresso; }
+            get => _counterEspresso;
             set
             {
                 _counterEspresso = value;
@@ -66,16 +88,112 @@ namespace CoffeeMachineSimulator.ViewModel
             }
         }
 
+        public int BoilerTemp
+        {
+            get => _boilerTemp;
+            set
+            {
+                _boilerTemp = value;
+                RaisePropertyChanged();
+            }
+        }
 
-        private void MakeCappuccino()
+        public int BeanLevel
+        {
+            get => _beanLevel;
+            set
+            {
+                _beanLevel = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public bool IsSendingPeriodically
+        {
+            get => _isSendingPeriodically;
+            set
+            {
+                if (_isSendingPeriodically != value)
+                {
+                    _isSendingPeriodically = value;
+
+                    if (_isSendingPeriodically)
+                    {
+                        _dispatcherTimer.Start();
+                    }
+                    else
+                    {
+                        _dispatcherTimer.Stop();
+                    }
+
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
+        public ObservableCollection<string> Logs { get; }
+
+        private async void MakeCappuccino()
         {
             CounterCappuccino++;
+            CoffeeMachineData coffeeMachineData = CreateCoffeMachineData(nameof(CounterCappuccino), CounterCappuccino);
+            await SendDataAsync(coffeeMachineData);
         }
 
-        private void MakeEspresso()
+        private async void MakeEspresso()
         {
             CounterEspresso++;
+            CoffeeMachineData coffeeMachineData = CreateCoffeMachineData(nameof(CounterEspresso), CounterEspresso);
+            await SendDataAsync(coffeeMachineData);
         }
 
+        private CoffeeMachineData CreateCoffeMachineData(string sensorType, int sensorValue)
+        {
+            return new()
+            {
+                City = City,
+                SerialNumber = SerialNumber,
+                SensorType = sensorType,
+                SensorValue = sensorValue,
+                RecordingTime = DateTime.Now
+            };
+        }
+
+        private async Task SendDataAsync(CoffeeMachineData data)
+        {
+            try
+            {
+            await _coffeeMachineDataSender.SendDataAsync(data);
+            WriteLog($"Sent data: {data}");
+
+            }
+            catch(Exception ex)
+            {
+                WriteLog($"Exception: {ex.Message}");
+            }
+        }
+
+        private async Task SendDataAsync(IEnumerable<CoffeeMachineData> data)
+        {
+            try
+            {
+                await _coffeeMachineDataSender.SendDataAsync(data);
+
+                foreach (CoffeeMachineData item in data)
+                {
+                    WriteLog($"Sent data: {item}");
+                }
+            }
+            catch (Exception ex)
+            {
+                WriteLog($"Exception: {ex.Message}");
+            }
+        }
+
+        private void WriteLog(string text)
+        {
+            //Insert always on the top of the list view
+            Logs.Insert(0, text);
+        }
     }
 }

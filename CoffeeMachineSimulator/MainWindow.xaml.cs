@@ -1,20 +1,9 @@
-﻿using CoffeeMachineSimulator.ViewModel;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using CoffeeMachine.EventHub.Sender;
+using CoffeeMachine.UI.ViewModel;
+using System.Configuration;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
-namespace CoffeeMachineSimulator
+namespace CoffeeMachine.UI
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -24,7 +13,9 @@ namespace CoffeeMachineSimulator
         public MainWindow()
         {
             InitializeComponent();
-            DataContext = new MainViewModel();
+            
+            string eventHubConnectionString = ConfigurationManager.AppSettings.Get("EventHubConnectionString");
+            DataContext = new MainViewModel(new CoffeeMachineDataSender(eventHubConnectionString)); //TODO: ADD DEPENDENCY INJECTION
         }
     }
 }
